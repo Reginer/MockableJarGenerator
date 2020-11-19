@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+group 'win.regin'
+version '1.0'
+
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+}
+
+dependencies {
+    compile group: 'org.ow2.asm', name: 'asm', version: '7.0'
+    compile group: 'org.ow2.asm', name: 'asm-tree', version: '7.0'
+    compile group: 'com.google.guava', name: 'guava', version: '23.0'
+}
