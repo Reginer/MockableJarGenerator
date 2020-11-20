@@ -36,4 +36,18 @@ grep -rn MockableJarTransform *
 ![编译报错](https://img-blog.csdnimg.cn/2020111918110281.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzI2NDEzMjQ5,size_16,color_FFFFFF,t_70#pic_center)
 重点来了，try一下就可以了，把使用不了class文件排除重新生成jar，Android Studio就可以识别了。
 ![重新生成jar](https://img-blog.csdnimg.cn/20201119181453123.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzI2NDEzMjQ5,size_16,color_FFFFFF,t_70#pic_center)
+
+但是生成完之后发现，android.jar是能用了，但是里面少了很多文件，只能祭出我们的终极大法了，修改as编译jar，让它不校验android.jar。
+
+修改MockableJarGenerator.java文件，将其中的处理全部删掉。方法是创建同包名，同方法名类文件，将方法体删掉，生成class文件替换进去:
+
+![替换文件](https://img-blog.csdnimg.cn/20201120151613514.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzI2NDEzMjQ5,size_16,color_FFFFFF,t_70#pic_center)
+替换的目标文件路径是gradle文件夹下的`caches\modules-2\files-2.1\com.android.tools.build\builder` 下的编译使用的版本下的jar包
+
+![目标文件](https://img-blog.csdnimg.cn/2020112015174430.png#pic_center)
+
+![目标文件](https://img-blog.csdnimg.cn/20201120151805740.png#pic_center)
+
+替换的过程中要关闭as，替换之后重新sync就可以了。
+
 [测试项目地址](https://github.com/Reginer/MockableJarGenerator)
