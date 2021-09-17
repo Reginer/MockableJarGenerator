@@ -1,4 +1,4 @@
-今天更改了android.jar，[如何更改看这里](https://blog.csdn.net/qq_26413249/article/details/109749465)，之后提示了如下错误:
+今天更改了android.jar，[直接可用成果物从这里下载](https://github.com/Reginer/aosp-android-jar)，[如何更改看这里](https://blog.csdn.net/qq_26413249/article/details/109749465)，之后提示了如下错误:
 
 ```
 Could not resolve all files for configuration ':mdm:androidApis'.
