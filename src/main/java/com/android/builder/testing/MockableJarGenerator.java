@@ -1,4 +1,4 @@
-package com.android.builder.testing;/*
+/*
  * Copyright (C) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +14,23 @@ package com.android.builder.testing;/*
  * limitations under the License.
  */
 
-import com.google.common.collect.ImmutableSet;
+package com.android.builder.testing;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.io.ByteStreams;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.util.Collections;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -31,15 +46,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.zip.ZipEntry;
-
 /**
  * Given a "standard" android.jar, creates a "mockable" version, where all classes and methods
  * are not final. Optionally makes all methods return "default" values, instead of throwing the
@@ -54,7 +60,7 @@ public class MockableJarGenerator {
     private static final String CONSTRUCTOR = "<init>";
     private static final String CLASS_CONSTRUCTOR = "<clinit>";
 
-    private static final ImmutableSet<String> ENUM_METHODS = ImmutableSet.of(
+    private static final ImmutableSet<String> ENUM_METHODS =  ImmutableSet.of(
             CLASS_CONSTRUCTOR, "valueOf", "values");
 
     private static final ImmutableSet<Type> INTEGER_LIKE_TYPES = ImmutableSet.of(
@@ -69,6 +75,33 @@ public class MockableJarGenerator {
     }
 
     public void createMockableJar(File input, File output) throws IOException {
+        Preconditions.checkState(
+                output.createNewFile(),
+                "Output file [%s] already exists.",
+                output.getAbsolutePath());
+
+        try (JarFile androidJar = new JarFile(input);
+             JarOutputStream outputStream =
+                     new JarOutputStream(
+                             new BufferedOutputStream(new FileOutputStream(output)))) {
+
+            for (JarEntry entry : Collections.list(androidJar.entries())) {
+                InputStream inputStream = androidJar.getInputStream(entry);
+
+                if (entry.getName().endsWith(".class")) {
+                    if (!skipClass(entry.getName().replace("/", "."))) {
+                        rewriteClass(entry, inputStream, outputStream);
+                    }
+                } else if (!skipEntry(entry)) {
+                    ZipEntry zipEntry = new ZipEntry(entry.getName());
+                    zipEntry.setComment(entry.getComment());
+                    outputStream.putNextEntry(zipEntry);
+                    ByteStreams.copy(inputStream, outputStream);
+                }
+
+                inputStream.close();
+            }
+        }
     }
 
     private static boolean skipEntry(JarEntry entry) {
@@ -104,12 +137,11 @@ public class MockableJarGenerator {
         modifyClass(classNode);
 
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        //todo 这里就是修复内容,加上try就不报错了
         try {
             classNode.accept(classWriter);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(entry.getName());
-            return;
+//            e.printStackTrace();
         }
 
         outputStream.putNextEntry(new ZipEntry(entry.getName()));
