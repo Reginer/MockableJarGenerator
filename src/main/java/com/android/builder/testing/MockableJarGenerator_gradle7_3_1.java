@@ -19,13 +19,11 @@ package com.android.builder.testing;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteStreams;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
-
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +31,20 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InnerClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
 /**
  * Given a "standard" android.jar, creates a "mockable" version, where all classes and methods
@@ -43,7 +55,7 @@ import java.util.zip.ZipEntry;
  * generated file name (e.g. add a "v2"). This will force Gradle to re-generate the jars in
  * existing projects.
  */
-public class MockableJarGenerator {
+public class MockableJarGenerator_gradle7_3_1 {
     private static final int EMPTY_FLAGS = 0;
     private static final String CONSTRUCTOR = "<init>";
     private static final String CLASS_CONSTRUCTOR = "<clinit>";
@@ -58,7 +70,7 @@ public class MockableJarGenerator {
     private final ImmutableSet<String> prefixesToSkip = ImmutableSet.of(
             "java.", "javax.", "org.xml.", "org.w3c.", "junit.", "org.apache.commons.logging");
 
-    public MockableJarGenerator(boolean returnDefaultValues) {
+    public MockableJarGenerator_gradle7_3_1(boolean returnDefaultValues) {
         this.returnDefaultValues = returnDefaultValues;
     }
 

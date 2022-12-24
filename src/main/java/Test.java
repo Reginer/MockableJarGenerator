@@ -1,4 +1,4 @@
-import com.android.builder.testing.MockableJarGenerator;
+import com.android.builder.testing.MockableJarGenerator_gradle4_2_2;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ public class Test {
         File outputFile = new File("/Users/wujieyuan/Downloads/mockable_android.jar");
         outputFile.delete();
 
-        MockableJarGenerator generator = new MockableJarGenerator(true);
+        MockableJarGenerator_gradle4_2_2 generator = new MockableJarGenerator_gradle4_2_2(true);
         try {
             generator.createMockableJar(input, outputFile);
         } catch (IOException e) {
