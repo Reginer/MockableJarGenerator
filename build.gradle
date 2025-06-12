@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.ow2.asm', name: 'asm', version: '7.0'
-    compile group: 'org.ow2.asm', name: 'asm-tree', version: '7.0'
-    compile group: 'com.google.guava', name: 'guava', version: '23.0'
+    implementation group: 'org.ow2.asm', name: 'asm', version: '9.8'
+    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.8'
+    implementation group: 'com.google.guava', name: 'guava', version: '23.0'
 }
